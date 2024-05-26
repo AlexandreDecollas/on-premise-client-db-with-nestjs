@@ -1,33 +1,6 @@
 version: "3.8"
 
 services:
-  gateway:
-    image: traefik:2.7
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-      - "3880:8080"
-    command:
-      - --providers.file.filename=/etc/traefik/traefik-dev.yml
-      - --providers.docker.exposedbydefault=false
-      - --global.sendAnonymousUsage=false
-      - --providers.docker=true
-      - --providers.docker.watch=true
-      - --providers.file.watch=true
-      - --accesslog=true
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.42.0.0/16
-      - --entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.42.0.0/16
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:rw
-      - ./infrastructure/gateway-dev.yml:/etc/traefik/traefik-dev.yml
-
-
-
   pgdb-main-db:
     image: postgres:14-bullseye
     environment:
