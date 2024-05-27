@@ -1,16 +1,13 @@
-import { Module, Scope } from '@nestjs/common';
-import {
-  MAIN_DB_CONNECTION,
-  MainDbConnectionModule,
-} from './main-db-connection.module';
+import { Global, Module, Scope } from '@nestjs/common';
+import { MAIN_DB_CONNECTION } from './main-db-connection.module';
 import { DataSource } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { DatabaseConfiguration } from './database-configuration';
 
 export const ON_PREMISE_DB_CONNECTION = Symbol();
 
+@Global()
 @Module({
-  imports: [MainDbConnectionModule],
   providers: [
     {
       provide: ON_PREMISE_DB_CONNECTION,
@@ -25,7 +22,7 @@ export const ON_PREMISE_DB_CONNECTION = Symbol();
           await mainDbDatasource.manager.query(
             `select db_conf from client_db_conf where client_id = '${clientId}';`,
           );
-        if (!clientDbConfRaw) {
+        if (clientDbConfRaw.length === 0) {
           throw new Error(`No client db conf found for client_id: ${clientId}`);
         }
         const dbConfiguration: DatabaseConfiguration =

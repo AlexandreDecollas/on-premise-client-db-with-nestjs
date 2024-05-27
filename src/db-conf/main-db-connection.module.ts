@@ -1,22 +1,26 @@
-import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Global, Module } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { DatabaseConfiguration } from './database-configuration';
 
 export const MAIN_DB_CONNECTION = Symbol();
 
+const mainDbConf: DatabaseConfiguration = {
+  host: 'localhost',
+  port: 34301,
+  password: 'adminpostgres',
+  username: 'adminpostgres',
+  database: 'maindb',
+};
+
+@Global()
 @Module({
   providers: [
     {
       provide: MAIN_DB_CONNECTION,
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService): Promise<DataSource> => {
+      useFactory: async (): Promise<DataSource> => {
         const dataSource = new DataSource({
           type: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USERNAME'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
+          ...mainDbConf,
         });
         return await dataSource.initialize();
       },
